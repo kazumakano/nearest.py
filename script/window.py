@@ -8,7 +8,7 @@ class Window:
     def __init__(self, current: datetime, log: Log) -> None:
         ts, mac, rssi = log.slice_win(current)
 
-        self.rssi_list = np.full(len(log.mac_list), -np.inf, dtype=np.float16)
+        self.rssi_list = np.full(len(log.mac_list), -np.inf, dtype=np.float32)
         if pf_param.WIN_POLICY == 1:
             for i in range(len(ts)):
                 for j, m in enumerate(log.mac_list):
@@ -23,7 +23,7 @@ class Window:
                         break
 
     def check_is_lost(self) -> None:
-        pf_param.IS_LOST = len(np.where(np.isneginf(self.rssi_list))[0]) == len(self.rssi_list)
+        pf_param.IS_LOST = len(np.where(np.isneginf(self.rssi_list) == False)[0]) == 0
 
     def get_strong_beacon_index(self) -> int:
         max_rssi = -np.inf
