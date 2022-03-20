@@ -16,7 +16,7 @@ def _set_main_params(conf: dict[str, Any]) -> None:
     BEGIN = datetime.strptime(conf["begin"], "%Y-%m-%d %H:%M:%S")
     END = datetime.strptime(conf["end"], "%Y-%m-%d %H:%M:%S")
     LOG_FILE = str(conf["log_file"])
-    INIT_POS = np.array(conf["init_pos"], dtype=np.float16)
+    INIT_POS = np.array(conf["init_pos"], dtype=np.float32)
     LOST_TJ_POLICY = np.int8(conf["lost_tj_policy"])
     RESULT_DIR_NAME = None if conf["result_dir_name"] is None else str(conf["result_dir_name"])
 
@@ -32,13 +32,12 @@ def nearest(conf: dict[str, Any], enable_show: bool = True) -> None:
     if pf_param.ENABLE_SAVE_VIDEO:
         map.init_recorder()
 
-    estim_pos = np.array(INIT_POS, dtype=np.float16)
+    estim_pos = np.array(INIT_POS, dtype=np.float32)
     lost_ts_buf = np.empty(0, dtype=datetime)
     t = BEGIN
     while t <= END:
         print(f"main.py: {t.time()}")
         win = Window(t, log)
-
         win.check_is_lost()
 
         if LOST_TJ_POLICY == 1:
