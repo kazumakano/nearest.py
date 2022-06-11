@@ -33,7 +33,7 @@ def nearest(conf: dict[str, Any], enable_show: bool = True) -> None:
         map.init_recorder()
 
     estim_pos = np.array(INIT_POS, dtype=np.float32)
-    lost_ts_buf = np.empty(0, dtype=datetime)
+    lost_ts_buf = []
     t = BEGIN
     while t <= END:
         print(f"main.py: {t.time()}")
@@ -42,7 +42,7 @@ def nearest(conf: dict[str, Any], enable_show: bool = True) -> None:
 
         if LOST_TJ_POLICY == 1:
             if not pf_param.IS_LOST:
-                estim_pos = map.beacon_pos_list[win.get_strong_beacon_index()]
+                estim_pos = map.beacon_pos_list[win.get_strong_beacon()]
                 map.draw_pos(estim_pos)
             if pf_param.TRUTH_LOG_FILE is not None:
                 map.draw_truth(truth.update_err(t, estim_pos, map.resolution, pf_param.IS_LOST), True)
@@ -50,16 +50,16 @@ def nearest(conf: dict[str, Any], enable_show: bool = True) -> None:
         elif LOST_TJ_POLICY == 2:
             if pf_param.TRUTH_LOG_FILE is not None and pf_param.IS_LOST:
                 last_estim_pos = estim_pos
-                lost_ts_buf = np.hstack((lost_ts_buf, t))
+                lost_ts_buf.append(t)
             elif not pf_param.IS_LOST:
-                estim_pos = map.beacon_pos_list[win.get_strong_beacon_index()]
+                estim_pos = map.beacon_pos_list[win.get_strong_beacon()]
                 map.draw_pos(estim_pos)
 
                 if pf_param.TRUTH_LOG_FILE is not None:
                     buf_len = len(lost_ts_buf)
                     for i, lt in enumerate(lost_ts_buf):
                         map.draw_truth(truth.update_err(lt, pf_util.get_lerped_pos(estim_pos, last_estim_pos, i, buf_len), map.resolution, True), True)
-                    lost_ts_buf = np.empty(0, dtype=datetime)
+                    lost_ts_buf.clear()
                     map.draw_truth(truth.update_err(t, estim_pos, map.resolution, False), True)
 
         if pf_param.ENABLE_SAVE_VIDEO:

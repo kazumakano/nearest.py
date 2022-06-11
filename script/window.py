@@ -25,12 +25,12 @@ class Window:
     def check_is_lost(self) -> None:
         pf_param.IS_LOST = len(np.where(np.isneginf(self.rssi_list) == False)[0]) == 0
 
-    def get_strong_beacon_index(self) -> int:
+    def get_strong_beacon(self) -> int:
         max_rssi = -np.inf
-        strong_beacon_index = -1
+        strong_beacon_idx = -1
         for i, r in enumerate(self.rssi_list):
             if r > max_rssi:
                 max_rssi = r
-                strong_beacon_index = i
+                strong_beacon_idx = i
 
-        return strong_beacon_index
+        return strong_beacon_idx
